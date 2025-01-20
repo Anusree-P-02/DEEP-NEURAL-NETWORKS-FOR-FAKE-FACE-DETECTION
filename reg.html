@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FakeRadar - Register</title>
+    <link rel="shortcut icon" type="image/icon" href="../static/assets/images/icon.jpg" style="border-radius: 0.75rem;">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/assets/css/login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-image" style="background-image: url(../static/assets/images/login.jpg);">
+            
+        </div>
+        <div class="login-form">
+            <h2>Create Account</h2>
+            <form id="registerForm" method="post">
+
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="username" placeholder="Username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="email" placeholder="Email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="password" placeholder="Password" name="password" required>
+                </div>
+      
+                <button type="submit" class="login-btn">Register</button>
+                
+                <div class="form-extras" style="float: right;">
+                    <a href="/">Already have an account?</a>
+                </div>
+                
+                <div id="errorMessage" class="error-message">
+                    Registration failed
+                </div>
+            </form>
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                    {% for category, message in messages %}
+                        <li class="flash {{ category }}">{{ message }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+        </div>
+    </div>
+    
+</body>
+</html>

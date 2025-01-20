@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FakeRadar - FakeDetect</title>
+    <link rel="shortcut icon" type="image/icon" href="../static/assets/images/icon.jpg" style="border-radius: 0.75rem;">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        body {
+            background-color: #f4f6f9;
+        }
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto px-4 py-5 ">
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Welcome, {{ session['username'] }}!</h2>
+                <p class="text-gray-500">Dashboard Overview</p>
+            </div>
+            <a href="{{ url_for('logout') }}" class="flex items-center text-red-500 hover:text-red-700">
+                <i data-feather="log-out" class="mr-2"></i>Logout
+            </a>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="dashboard-card p-6 rounded-lg shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <i data-feather="clock" class="text-white"></i>
+                    <span class="text-sm text-white opacity-75">Login Time</span>
+                </div>
+                <h3 class="text-xl font-semibold">{{ session['login_time'] }}</h3>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <i data-feather="activity" class="text-purple-600"></i>
+                    <span class="text-sm text-gray-500">Recent Activity</span>
+                </div>
+                <ul class="space-y-2">
+                    <li class="flex items-center">
+                        <i data-feather="check-circle" class="mr-2 text-green-500"></i>
+                        Logged in successfully
+                    </li>
+                    <li class="flex items-center">
+                        <i data-feather="database" class="mr-2 text-blue-500"></i>
+                        Last data accessed
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-green-100 p-6 rounded-lg shadow-lg">
+                <div class="flex justify-between items-center mb-4">
+                    <i data-feather="user" class="text-green-600"></i>
+                    <span class="text-sm text-gray-600">Profile</span>
+                </div>
+                <h3 class="text-xl font-semibold text-green-800">{{ session['username'] }}</h3>
+                <p class="text-green-600">Active User</p>
+            </div>
+        </div>
+
+        <section class="mt-8 bg-white rounded-lg shadow-lg p-6">
+            <h3 class="text-2xl font-bold mb-4 text-gray-800">Website Overview</h3>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="text-xl font-semibold mb-3 text-purple-700">About FakeDetect</h4>
+                    <p class="text-gray-600 mb-4">
+                        A cutting-edge platform using advanced AI to detect manipulated or synthetic images with high accuracy.
+                     
+                    </p>
+                </div>
+                <div>
+                    <a href="/prediction" class="w-full block">
+                        <button class="w-full bg-purple-600 text-white py-3 px-6 rounded-lg hover:bg-purple-700 transition duration-300 flex items-center justify-center">
+                            <i data-feather="search" class="mr-2"></i>
+                            Start Image Prediction
+                        </button>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-6 bg-blue-100 rounded-lg shadow-lg p-5">
+            <h3 class="text-xl font-bold mb-4 text-blue-800">Key Features</h3>
+            <div class="grid md:grid-cols-3 gap-4">
+                <div class="bg-white p-4 rounded-lg">
+                    <i data-feather="shield" class="text-blue-600 mb-2"></i>
+                    <h4 class="font-semibold">Advanced Detection</h4>
+                    <p class="text-sm text-gray-600">AI-powered image verification</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg">
+                    <i data-feather="upload" class="text-green-600 mb-2"></i>
+                    <h4 class="font-semibold">Easy Upload</h4>
+                    <p class="text-sm text-gray-600">Simple image upload process</p>
+                </div>
+                <div class="bg-white p-4 rounded-lg">
+                    <i data-feather="trending-up" class="text-purple-600 mb-2"></i>
+                    <h4 class="font-semibold">Continuous Learning</h4>
+                    <p class="text-sm text-gray-600">Constantly improving detection</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        feather.replace();
+    </script>
+</body>
+</html>

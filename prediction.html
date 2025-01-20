@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FakeRadar - Image Verification</title>
+    <link rel="shortcut icon" type="image/icon" href="../static/assets/images/icon.jpg" style="border-radius: 0.75rem;">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        .drop-zone {
+            border: 2px dashed #a0aec0;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background-color: #f3f4f6;
+        }
+        .upload-icon {
+            transition: transform 0.3s ease;
+        }
+        .drop-zone:hover .upload-icon {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+    
+    <div class="container mx-auto px-8 py-12  w-full">
+        <header class="flex justify-between items-center mb-8" style="margin-bottom:60px; ">
+            <div>
+                <h2 class="text-3xl font-bold text-gray-800">Welcome, {{ session['username'] }}!</h2>
+                <p class="text-gray-500">Find the Image is Real!!</p>
+            </div>
+            <a href="{{ url_for('home') }}" class="flex  text-black-500 hover:text-blue-700" >
+                <i data-feather="Home" class="mr-2"></i>Home
+            </a>
+            <a href="{{ url_for('logout') }}" class="flex items-center text-red-500 hover:text-red-700">
+                <i data-feather="log-out" class="mr-2"></i>Logout
+            </a>
+        </header>
+        <div class="bg-white rounded-xl shadow-2xl overflow-hidden" style="margin:0px 100px;">
+            <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-center">
+                <h1 class="text-3xl font-bold text-white flex items-center justify-center">
+                    <i data-feather="shield" class="mr-3 text-white"></i>
+                    Fake Face Detection
+                </h1>
+                <p class="text-purple-100 mt-2">AI-Powered Image Verification</p>
+            </div>
+
+            <div class="p-6">
+                <form id="uploadForm" action="/predict" method="POST" enctype="multipart/form-data">
+                    <div id="dropZone" class="drop-zone p-8 text-center cursor-pointer">
+                        <input 
+                            type="file" 
+                            id="fileInput" 
+                            name="file" 
+                            class="hidden" 
+                            accept="image/*"
+                        >
+                        <div class="flex flex-col items-center">
+                            <i data-feather="upload" class="upload-icon text-gray-500 w-16 h-16 mb-4"></i>
+                            <p class="text-gray-600 mb-2">
+                                Drag and drop an image or 
+                                <span class="text-purple-600 font-semibold hover:underline">
+                                    click to browse
+                                </span>
+                            </p>
+                            <p class="text-xs text-gray-500">
+                                Supported formats: PNG, JPG, JPEG
+                            </p>
+                        </div>
+                    </div>
+                </form>
+
+                <div id="fileInfo" class="mt-4 hidden">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center justify-between">
+                        <div class="flex items-center">
+                            <i data-feather="file" class="text-green-600 mr-3"></i>
+                            <span id="fileName" class="text-green-800 font-medium"></span>
+                        </div>
+                        <button id="removeFile" type="button" class="text-red-500 hover:text-red-700">
+                            <i data-feather="x"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button 
+                    id="detectButton"
+                    type="submit" 
+                    form="uploadForm"
+                    class="w-full mt-6 bg-purple-600 text-white py-3 px-6 rounded-lg 
+                    hover:bg-purple-700 transition duration-300 
+                    flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled
+                >
+                    <i data-feather="search" class="mr-2"></i>
+                    Detect Fake Face
+                </button>
+            </div>
+        </div>
+
+        {% if result %}
+        <div class="mt-6 bg-white rounded-xl shadow-2xl overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-teal-600 p-4 text-center">
+                <h2 class="text-xl font-bold text-white">Detection Result</h2>
+            </div>
+            <div class="p-6 text-center">
+                <p class="mb-4 text-lg font-semibold text-gray-800">{{ result }}</p>
+                <img 
+                    src="{{ url_for('static', filename=image_path) }}" 
+                    alt="Uploaded Image" 
+                    class="max-w-full mx-auto rounded-lg shadow-md"
+                    style="max-width: 300px;"
+                />
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        feather.replace();
+
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        const detectButton = document.getElementById('detectButton');
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        dropZone.addEventListener('drop', handleDrop, false);
+
+        // Handle click to browse
+        dropZone.addEventListener('click', () => fileInput.click());
+
+        // Handle file input change
+        fileInput.addEventListener('change', handleFiles, false);
+
+        // Remove file
+        removeFile.addEventListener('click', () => {
+            fileInput.value = '';
+            fileInfo.classList.add('hidden');
+            detectButton.disabled = true;
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            dropZone.classList.add('drag-over');
+        }
+
+        function unhighlight() {
+            dropZone.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFileSelect(files);
+        }
+
+        function handleFiles() {
+            handleFileSelect(fileInput.files);
+        }
+
+        function handleFileSelect(files) {
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.type.startsWith('image/')) {
+                    fileName.textContent = file.name;
+                    fileInfo.classList.remove('hidden');
+                    detectButton.disabled = false;
+                } else {
+                    alert('Please upload a valid image file.');
+                    fileInput.value = '';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
